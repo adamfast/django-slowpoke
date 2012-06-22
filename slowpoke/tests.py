@@ -9,16 +9,16 @@ from slowpoke.models import *
 
 class SlowPokeDecoratorTests(TestCase):
 
+    @time_my_test('setup')
     def setUp(self):
         self._old_time_standards = getattr(settings, 'TIME_STANDARDS', False)
         settings.TIME_STANDARDS = False  # we want the defaults to take effect for these or else tests will have inconsistent results
+        time.sleep(0.2)
 
+    @time_my_test('teardown')
     def tearDown(self):
         settings.TIME_STANDARDS = self._old_time_standards
-
-    def test_foo(self):
-        """If the first test runs is timed the run isn't there, so I have to no-op."""
-        self.assertEqual(True, True)
+        time.sleep(0.1)
 
     @time_my_test('task')
     def test_task_ok(self):
