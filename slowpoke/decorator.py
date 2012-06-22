@@ -9,7 +9,7 @@ from slowpoke.models import *
 class time_my_test(object):
 
     def __init__(self, standard, *args, **kwargs):
-        settings.CURRENT_SLOWPOKE_STANDARD = standard
+        self.CURRENT_SLOWPOKE_STANDARD = standard
 
     def __call__(self, func):
 
@@ -22,7 +22,7 @@ class time_my_test(object):
             sr = TestSuiteRun.objects.using('slowpokelogs').get(pk=settings.CURRENT_SLOWPOKE_RUN)
             tr = TestRun()
             tr.suite_run = sr
-            tr.test_standard = settings.CURRENT_SLOWPOKE_STANDARD
+            tr.test_standard = self.CURRENT_SLOWPOKE_STANDARD
             tr.function_name = str(func.__name__)
             tr.args = str(args)
             tr.kwargs = str(kwargs)
