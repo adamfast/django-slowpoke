@@ -18,15 +18,13 @@ class time_my_test(object):
             result = func(*args, **kwargs)
             te = time.time()
 
-            # check this against TIME_STANDARDS for the level of function. Log if it was too slow.
-            sr = TestSuiteRun.objects.using('slowpokelogs').get(pk=settings.CURRENT_SLOWPOKE_RUN)
+            # Log this test's runtime.
             tr = TestRun()
-            tr.suite_run = sr
             tr.test_standard = self.CURRENT_SLOWPOKE_STANDARD
             tr.function_name = str(func.__name__)
             tr.args = str(args)
             tr.kwargs = str(kwargs)
             tr.runtime_ms = (te - ts) * 1000
-            tr.save(using='slowpokelogs')
+            settings.CURRENT_SLOWPOKE_TEST_RUNS.append(tr)
             return result
         return to_time
