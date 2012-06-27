@@ -5,7 +5,10 @@ import time
 from django.db import connections
 from django.conf import settings
 from django.test.simple import DjangoTestSuiteRunner
-from django.utils.timezone import now
+try:
+    from django.utils.timezone import now
+except ImportError:
+    now = datetime.datetime.now
 
 from slowpoke.models import *
 
