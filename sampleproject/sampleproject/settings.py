@@ -163,3 +163,4 @@ DATABASES['slowpokelogs'] = {
 }
 DATABASE_ROUTERS = ['slowpoke.router.SlowPokeDBRouter']
 TEST_RUNNER = 'slowpoke.runner.SlowPokeTestRunner'
+AVOID_TESTS_FOR = ['django']

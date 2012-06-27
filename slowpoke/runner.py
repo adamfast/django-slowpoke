@@ -32,6 +32,20 @@ class SlowPokeTestRunner(DjangoTestSuiteRunner):
         result = super(SlowPokeTestRunner, self).teardown_databases(old_config, **kwargs)
         return result
 
+    def build_suite(self, *args, **kwargs):
+        suite = super(SlowPokeTestRunner, self).build_suite(*args, **kwargs)
+
+        if getattr(settings, 'AVOID_TESTS_FOR', -1) != -1:
+            keep_tests = []
+            for case in suite:
+                pkg = case.__class__.__module__.split('.')[0]
+                if pkg not in settings.AVOID_TESTS_FOR:
+                    keep_tests.append(case)
+
+            suite._tests = keep_tests
+
+        return suite
+
     def run_tests(self, test_labels, extra_tests=None, **kwargs):
         self._the_run = TestSuiteRun(start=now(), machine=socket.gethostname())
 
