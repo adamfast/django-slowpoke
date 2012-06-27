@@ -1,0 +1,68 @@
+slowpoke is desiged to allow developers to require specific performance of themselves during test execution. I call this "legislated performance."
+
+This is good for a few reasons:
+- If you screw something up and take a single view from 100ms to 1500ms, you'll know about it very quickly.
+- If you have an SLA that requires your view to respond in a certain amount of time, you will want to make sure all of those views respond that quickly during testing.
+- Users like fast apps, and devs should too.
+
+This is bad for a few reasons:
+- Computers are different. Need for Speed ran great on my IBM PS/2 Model 25 but was unplayable when I got a 486. If you set your standards for a lightly loaded 16-core Xeon box and regularly run tests on a Core 2 1.6, you're not going to have valid data.
+- It doesn't take setUp / tearDown processing into account (maybe a good thing too?)
+    NOTE: If you decorate setUp/tearDown then they will be timed / recorded
+
+It's got plenty of moving pieces to install right now - I don't see any way to make it simpler, but it does exactly what I want.
+
+PYTHONPATH issues:
+- django-slowpoke needs to be on your PYTHONPATH or in the virtualenv so that slowpoke.* will resolve.
+- If you want to use the sample installation, django-slowpoke/sampleproject also needs to be on your PYTHONPATH/virtualenv so that sampleproject and testapp resolve.
+
+Settings:
+    TIME_STANDARDS:
+        A dict of what each type of test *should* take to execute. Times are in milliseconds. Defaults to
+        {
+            'task': 1000,
+            'web_view': 300,
+        }
+
+Add 'slowpoke' to your INSTALLED_APPS.
+
+Configure the database:
+DATABASES['slowpokelogs'] = {
+    'ENGINE': 'django.db.backends.postgresql_psycopg2',
+    'NAME': 'slowpokelogs',
+    'USER': '',
+    'PASSWORD': '',
+    'HOST': '',
+    'PORT': '',
+}
+
+and the database router, which will send traffic to the right place when it's related to slowpoke (technically, all the code should use the using= kwarg to make this unnecessary...but just in case):
+DATABASE_ROUTERS = ['slowpoke.router.SlowPokeDBRouter']
+
+and the test runner, which handles setup tasks and creates logs on the fly when you do a test suite run.
+TEST_RUNNER = 'slowpoke.runner.SlowPokeTestRunner'
+
+And lastly, you need to specify which tests should be timed with a decorator. This is because MOST tests in our suite may not test just one thing, or test it all the way through in a way the time means something. Your data will be better if you create new tests that take an action all the way through and time that.
+
+from django.test import TestCase
+from slowpoke.decorator import time_my_test
+
+class DecoratorTests(TestCase):
+    @time_my_test('web_view')
+    def test_view_ok(self):
+        time.sleep(0.2)
+        self.assertEqual(True, True)
+
+    @time_my_test('web_view')
+    def test_view_slow(self):
+        time.sleep(0.35)
+        self.assertEqual(True, True)
+
+One of these will meet the standards, one will not. (if you want to time setUp / tearDown they are decoratable as well, and will show which method they were run for.)
+
+But what if we want to time ALL the tests?
+I've spent some time trying to find a way to make this happen - but because of the way things go all the way down to unittest, I can't find a good way to intercept, run and time a test at a time. If you've got an idea that will work, I'd love to hear it.
+
+Other batteries:
+- The test runner will advise you about various simple settings that might make your tests faster if it detects something.
+- The test runner will allow you to include apps in settings.AVOID_TESTS_FOR and make sure their tests do not run (i.e. django, debug_toolbar, anything you're unlikely to be editing and at risk of breaking). This only matches the first part of the namespace - 'django' is valid, 'django.contrib.gis' won't do anything.
