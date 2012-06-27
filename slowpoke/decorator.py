@@ -8,7 +8,7 @@ from slowpoke.models import *
 
 class time_my_test(object):
 
-    def __init__(self, standard, *args, **kwargs):
+    def __init__(self, standard='unknown', *args, **kwargs):
         self.CURRENT_SLOWPOKE_STANDARD = standard
 
     def __call__(self, func):
