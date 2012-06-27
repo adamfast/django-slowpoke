@@ -60,6 +60,10 @@ class DecoratorTests(TestCase):
 
 One of these will meet the standards, one will not. (if you want to time setUp / tearDown they are decoratable as well, and will show which method they were run for.)
 
+In your admin you'll see a model with each test run, and as inlines on that object each of the tests that was timed, how long it took and whether or not that was up to the defined baseline.
+
+Now that you're logging this data though there's a lot of potential - want to ensure that each iterative run doesn't add more than 10% to execution time? The runner could be modified to look at the last run, or an aggregate of last run times, and do comparisons. I don't have a big enough archive of data to figure out what's useful or not yet - but neither do you. If you have ideas, please let me know.
+
 But what if we want to time ALL the tests?
 I've spent some time trying to find a way to make this happen - but because of the way things go all the way down to unittest, I can't find a good way to intercept, run and time a test at a time. If you've got an idea that will work, I'd love to hear it.
 
