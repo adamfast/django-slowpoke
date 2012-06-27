@@ -47,6 +47,15 @@ class SlowPokeTestRunner(DjangoTestSuiteRunner):
         return suite
 
     def run_tests(self, test_labels, extra_tests=None, **kwargs):
+        if getattr(settings, 'SOUTH_TESTS_MIGRATE', False) == True:
+            print('settings.SOUTH_TESTS_MIGRATE is True, which will take longer as it migrates your database step by step.')
+
+        if getattr(settings, 'SKIP_SOUTH_TESTS', False) == True:
+            print('settings.SKIP_SOUTH_TESTS is True, which will take longer as South runs its own internal tests.')
+
+        if getattr(settings, 'AVOID_TESTS_FOR', -1) == -1:
+            print("If you want faster tests and aren't worried about running a bunch of Django's own tests, you can add AVOID_TESTS_FOR = ['django'] to your settings file to have them skipped. Any other apps you wish to skip can be added there as well.")
+
         self._the_run = TestSuiteRun(start=now(), machine=socket.gethostname())
 
         result = super(SlowPokeTestRunner, self).run_tests(test_labels, extra_tests, **kwargs)
