@@ -33,7 +33,7 @@ class TestRun(models.Model):
 def populate_meets_standard(*args, **kwargs):
     instance = kwargs['instance']
 
-    if instance.runtime_ms and getattr(TIME_STANDARDS, instance.test_standard, False):
+    if instance.runtime_ms and TIME_STANDARDS.get(instance.test_standard, False):
         if instance.runtime_ms < TIME_STANDARDS[instance.test_standard]:
             instance.meets_standard = True
         else:
