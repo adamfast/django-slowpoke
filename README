@@ -6,7 +6,7 @@ This is good for a few reasons:
 - Users like fast apps, and devs should too.
 
 This is bad for a few reasons:
-- Computers are different. Need for Speed ran great on my IBM PS/2 Model 25 but was unplayable when I got a 486. If you set your standards for a lightly loaded 16-core Xeon box and regularly run tests on a Core 2 1.6, you're not going to have valid data.
+- Computers are different. Need for Speed ran great on my IBM PS/2 Model 25 but was unplayable when I got a 486. If you set your standards for a lightly loaded 16-core Xeon box and regularly run tests on a Core 2 1.6, you're not going to have valid data. (note: it DOES log the hostname of the computer the tests were run on to give you a chance to sort that type of thing out.)
 - It doesn't take setUp / tearDown processing into account (maybe a good thing too?)
     NOTE: If you decorate setUp/tearDown then they will be timed / recorded
 
