@@ -68,5 +68,12 @@ class SlowPokeTestRunner(DjangoTestSuiteRunner):
         for tr in settings.CURRENT_SLOWPOKE_TEST_RUNS:
             tr.suite_run = self._the_run
             tr.save(using='slowpokelogs')
+
+        print('%d tests met their performance standard.' % self._the_run.testrun_set.filter(meets_standard=True).count())
+        print('%d tests did not meet their performance standard.' % self._the_run.testrun_set.filter(meets_standard=False).count())
+
+        for the_test in self._the_run.testrun_set.filter(meets_standard=False):
+            print('%s took %sms, %sms allowed.' % (the_test.function_name, the_test.runtime_ms, TIME_STANDARDS.get(the_test.test_standard)))
+
         settings.DATABASES['slowpokelogs']['NAME'] = 'test_slowpokelogs'
         return result
