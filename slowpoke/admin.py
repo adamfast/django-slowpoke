@@ -36,6 +36,7 @@ class TestRunInline(admin.TabularInline):
     fields = ('meets_standard', 'test_standard_display', 'runtime_ms', 'function_name', 'args', 'kwargs')
     readonly_fields = ('meets_standard', 'test_standard_display', 'test_standard', 'runtime_ms', 'function_name', 'args', 'kwargs')
     extra = 0
+    ordering = ('-runtime_ms',)
 
     def save_model(self, request, obj, form, change):
         # Tell Django to save objects to the 'other' database.
