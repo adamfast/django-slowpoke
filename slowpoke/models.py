@@ -12,6 +12,18 @@ class TestSuiteRun(models.Model):
     end = models.DateTimeField(null=True, blank=True)
     machine = models.CharField(max_length=128)
 
+    def runtime(self):
+        duration = (self.end - self.start).seconds
+        hours, remainder = divmod(duration, 3600)
+        minutes, seconds = divmod(remainder, 60)
+
+        if hours:
+            return '%d hrs, %d min, %d sec' % (hours, minutes, seconds)
+        else:
+            if minutes:
+                return '%d min, %d sec' % (minutes, seconds)
+            return '%d sec' % seconds
+
 
 class TestRun(models.Model):
     suite_run = models.ForeignKey(TestSuiteRun)

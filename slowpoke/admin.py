@@ -61,10 +61,10 @@ class TestRunInline(admin.TabularInline):
 
 
 class TestSuiteRunAdmin(MultiDBModelAdmin):
-    list_display = ('start', 'end', 'machine')
+    list_display = ('runtime', 'start', 'end', 'machine')
     list_filter = ('machine',)
     inlines = [TestRunInline,]
-    readonly_fields = ('start', 'end', 'machine')
+    readonly_fields = ('start', 'end', 'runtime', 'machine')
 
 
 admin.site.register(TestSuiteRun, TestSuiteRunAdmin)
