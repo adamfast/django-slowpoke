@@ -15,9 +15,11 @@ from slowpoke.models import *
 
 class SlowPokeTestRunner(DjangoTestSuiteRunner):
     def setup_databases(self, **kwargs):
+        self.slowpoke_db_original = settings.DATABASES['slowpokelogs']['NAME']
         result = super(SlowPokeTestRunner, self).setup_databases(**kwargs)
+        self.slowpoke_db_test = settings.DATABASES['slowpokelogs']['NAME']
         # set it back, we don't want to use an auto-destroyed test DB
-        settings.DATABASES['slowpokelogs']['NAME'] = 'slowpokelogs'
+        settings.DATABASES['slowpokelogs']['NAME'] = self.slowpoke_db_original
         connections['slowpokelogs'].close()  # the wrong connection is open right now. close it and Django will do the right thing next.
         # now create the run in the real database
         self._the_run.save(using='slowpokelogs')
@@ -28,7 +30,7 @@ class SlowPokeTestRunner(DjangoTestSuiteRunner):
 
     def teardown_databases(self, old_config, **kwargs):
         # set it back, we don't want to auto-destroy our real DB
-        settings.DATABASES['slowpokelogs']['NAME'] = 'test_slowpokelogs'
+        settings.DATABASES['slowpokelogs']['NAME'] = self.slowpoke_db_test
         result = super(SlowPokeTestRunner, self).teardown_databases(old_config, **kwargs)
         return result
 
@@ -61,7 +63,7 @@ class SlowPokeTestRunner(DjangoTestSuiteRunner):
         result = super(SlowPokeTestRunner, self).run_tests(test_labels, extra_tests, **kwargs)
         # this will call setup_databases(), do things, then teardown_databases.
 
-        settings.DATABASES['slowpokelogs']['NAME'] = 'slowpokelogs'
+        settings.DATABASES['slowpokelogs']['NAME'] = self.slowpoke_db_original
         self._the_run.end = now()
         self._the_run.save(using='slowpokelogs')
 
@@ -75,5 +77,5 @@ class SlowPokeTestRunner(DjangoTestSuiteRunner):
         for the_test in self._the_run.testrun_set.filter(meets_standard=False):
             print('%s took %sms, %sms allowed.' % (the_test.function_name, the_test.runtime_ms, TIME_STANDARDS.get(the_test.test_standard)))
 
-        settings.DATABASES['slowpokelogs']['NAME'] = 'test_slowpokelogs'
+        settings.DATABASES['slowpokelogs']['NAME'] = self.slowpoke_db_test
         return result
