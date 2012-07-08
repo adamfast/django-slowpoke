@@ -21,7 +21,6 @@ class TestRun(models.Model):
     kwargs = models.TextField(null=True, blank=True)
     runtime_ms = models.PositiveIntegerField()
     meets_standard = models.NullBooleanField()
-#    passed = models.BooleanField()
 
     def test_standard_display(self):
         for standard in TIME_STANDARDS.keys():
