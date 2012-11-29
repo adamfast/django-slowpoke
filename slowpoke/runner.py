@@ -58,6 +58,12 @@ class SlowPokeTestRunner(DjangoTestSuiteRunner):
         if getattr(settings, 'AVOID_TESTS_FOR', -1) == -1:
             print("If you want faster tests and aren't worried about running a bunch of Django's own tests, you can add AVOID_TESTS_FOR = ['django'] to your settings file to have them skipped. Any other apps you wish to skip can be added there as well.")
 
+        old_password_hashers = getattr(settings, 'PASSWORD_HASHERS', None)
+        if not getattr(settings, 'SLOWPOKE_IGNORE_HASHER', False):
+            if old_password_hashers != ['django.contrib.auth.hashers.MD5PasswordHasher']:
+                print("Changing to django.contrib.auth.hashers.MD5PasswordHasher will speed up your tests, I've changed it for you automatically for this run. Set settings.SLOWPOKE_IGNORE_HASHER to True to ignore this and leave the setting alone.")
+                settings.PASSWORD_HASHERS = ['django.contrib.auth.hashers.MD5PasswordHasher']
+
         self._the_run = TestSuiteRun(start=now(), machine=socket.gethostname())
 
         result = super(SlowPokeTestRunner, self).run_tests(test_labels, extra_tests, **kwargs)
@@ -78,4 +84,5 @@ class SlowPokeTestRunner(DjangoTestSuiteRunner):
             print('%s took %sms, %sms allowed.' % (the_test.function_name, the_test.runtime_ms, TIME_STANDARDS.get(the_test.test_standard)))
 
         settings.DATABASES['slowpokelogs']['NAME'] = self.slowpoke_db_test
+        settings.PASSWORD_HASHERS = old_password_hashers
         return result

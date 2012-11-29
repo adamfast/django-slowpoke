@@ -4,7 +4,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='slowpoke',
-    version='1.0.0',
+    version='1.0.1',
     description='A utility to track test execution over time.',
     author='Adam Fast',
     author_email='adamfast@gmail.com',
